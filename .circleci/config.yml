@@ -8,6 +8,12 @@ jobs:
     # Install php packages and run tests
     docker:
       - image: cimg/php:8.1-node
+      - image: mysql:8.0
+        environment:
+          MYSQL_DATABASE: laravel_test
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: root
     steps:
       - checkout
       - php/install-packages
@@ -15,11 +21,23 @@ jobs:
           name: Setup environment file
           command: cp .env.example .env
       - run:
+          name: Set database config
+          command: |
+            echo "DB_CONNECTION=mysql" >> .env
+            echo "DB_HOST=127.0.0.1" >> .env
+            echo "DB_PORT=3306" >> .env
+            echo "DB_DATABASE=laravel_test" >> .env
+            echo "DB_USERNAME=user" >> .env
+            echo "DB_PASSWORD=password" >> .env
+      - run:
           name: Generate application key
           command: php artisan key:generate
       - run:
           name: Clear config cache
           command: php artisan config:clear
+      - run:
+          name: Run migrations
+          command: php artisan migrate --env=testing --force
       - run:
           name: run tests
           command: ./vendor/bin/phpunit
