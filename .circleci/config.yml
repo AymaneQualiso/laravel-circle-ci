@@ -12,6 +12,15 @@ jobs:
       - checkout
       - php/install-packages
       - run:
+          name: Setup environment file
+          command: cp .env.example .env
+      - run:
+          name: Generate application key
+          command: php artisan key:generate
+      - run:
+          name: Clear config cache
+          command: php artisan config:clear
+      - run:
           name: run tests
           command: ./vendor/bin/phpunit
   deploy:
