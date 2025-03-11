@@ -72,12 +72,12 @@ workflows:
     when:
       equal: [ "main", << pipeline.git.branch >> ]
     jobs:
-      - test-prod
+      - test-php
       # - deploy-prod
 
   development_pipeline:
     when:
       equal: [ "dev", << pipeline.git.branch >> ]
     jobs:
-      - test-dev
+      - test-php
       # - deploy-dev
