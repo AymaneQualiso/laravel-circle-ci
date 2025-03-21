@@ -59,19 +59,12 @@ jobs:
         run: ./vendor/bin/phpunit
 
   deploy:
-    needs: run-deploy
+    needs: test-php
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-
-      # - name: Setup SSH Key
-        # run: |
-        #   mkdir -p ~/.ssh
-        #   echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        #   chmod 600 ~/.ssh/id_rsa
-        #   ssh-keyscan -H 54.163.148.40 >> ~/.ssh/known_hosts
 
       - name: Connect to AWS EC2 & Deploy
         env:
@@ -83,19 +76,18 @@ jobs:
           chmod 600 deploy_key.pem
 
           ssh -o StrictHostKeyChecking=no -i deploy_key.pem $USER@$SERVER_IP << 'EOF'
-            echo "Connected to AWS EC2 ✅"
+            echo "✅ Connected to AWS EC2"
 
             # Ensure project directory exists
             mkdir -p /home/ubuntu/my-app
-
-            # Go to project directory
             cd /home/ubuntu/my-app || exit 1
 
-            # Check if the directory is a Git repository
+            # Clone or pull the latest code
             if [ ! -d ".git" ]; then
               git clone git@github.com:AymaneQualiso/laravel-circle-ci.git .
             else
-              # Pull Latest Changes
               git reset --hard
               git pull origin main || true
-            fi
+            fi
+
+          EOF
