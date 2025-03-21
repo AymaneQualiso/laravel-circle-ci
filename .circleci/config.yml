@@ -62,9 +62,35 @@ jobs:
       - run:
           name: Setup SSH Key & Deploy
           env:
-            SSH_PRIVATE_KEY: ${{ secrets.AWS }}
-            SERVER_IP: ${{ secrets.AWS_SERVER_IP }}
-            USER: ${{ secrets.AWS_USER }}
+            SSH_PRIVATE_KEY: "-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEArvdDzS+rK9wL/mqvyG36WoTjtIl2LkXZ8mbbUmUSzQe2tJyl
+7sNqrqDnmY+T/jEh21iIFGw4QX1Vf8GVmIaWLrE6hC8TB7w+7nfpY7VuyezWGiMJ
+KV0TeCvZFNkPJPI8mh0T/zHHHD3JelFmD60qkmoWaBeOkU4ykmqxXO7gsuByAHVA
+QrfRuWphB2FOWPr3WR0q2PhEiEF1sHXX6jiEOHU/VK9bmIzW8ftSViPoFpyqq4sa
+MX4EP46aTjJCr3ih2RGDcRINgT5tL31EYWdsu2PSHh71xF2++460NLEgbGB69J5Y
+vlDEMxR4YJmidyzHWdgVWMwq8PElkuY9137tlQIDAQABAoIBAG88oQyYm9jco3ty
+1KM22I4oIqSrKEmu+yuTnSi7PcLAfrZBSXWNJAw2HEiS8eIP1pifppRlYTaxumPo
+7XT1TBIPd0aGrzChy9jMv8M2nGMggdZIJBD6LeCe7/rDLU+t+j148zexrAcWeTuc
++KhKzeAcNnajU26qKpjP4EdXT+Aop/Bp7zWbR44rvtVjGQDOwTpd2TqHQHyz5wo+
+UEpcfpXZPW6RbS7Nnj/Le8uYRNTJWsYcvzT286IWv3CR5a5RvZHOQ1x2lUi08y4C
+lF1nKOURPOSepjqvVmCFl/XoLyYk4sipA/WyyAaAinxpCdRQA7icASjk7pYbhnWa
+ZKeJ+BkCgYEA5ugOYYWK52fkCzflVzuQuRg3NiyIdpZF7VfSYv37gimq9n7dgELX
+EXXmaxrJxD4rPp60I5GCvVqErWVfPPmhzvZoLBUcpyx8Mya0Ndb2nP57ACQUsARX
+3BOOHMzgLUMgGKMAFcbn3jHxnTUFbjldA5QxNJJncho4Jn9ZuftOzuMCgYEAwfrp
+M3TkrZsZNbgTXaLK5uPL2IgC9jB6WS7paP/Fj5p4nx/G8kaEVFz4NnvtGq8tmzDi
+SPUmasg4edv5lMSmZYw9WGx/tHa775MBJm3cepRO9b+f9klSWWocI3tUN9mi1NXX
+JvHpkeJDxSf+Yoj6vIGD9/ta4eMiDpbkZg/IQycCgYBwWsAMod9J5BppfwRAIwKz
+nd3XpWmtUkeqSk5bzrvfxQikMmzzKRLfMyAwQ3Oj4qBGMxDyMa6NFotyl930nH8o
+Zmuf75HmolW4yf9sJzIOiCEvm17ZmvNpabZ/uwzl2UC33DCBaCyQyHqJhTAkRxNE
+V4pty0M8mRdzXAo73dWmAwKBgQCGkeOgD/LowRVfIAFHTz1FqjhrUggD9KOcJSBF
++FJ9CiOt+GSTBPqecBS974EQpwCTjfkdtfxdzeLoHwPpAfeRsRWJt1NsxYYhcLE2
+kLaIz0Rr1fFJ8ZnQb/1vXAqT6Ea/Mk5dNSvdScPMDa+7ed3AUnVT3qsw09p3lpSC
+fWZntwKBgGC1d2Eq7vGzLzkQvNJOF2g44CLZCA8T/bDHn5l6FP4wKq/TQgxbCJaV
+rVzz9BeT0HE1HgyEsgWdxOuUvGeg5+BQjGJWfx43xWTNjD8SASkKbjWsneG1mpaa
+F35X9QU3x9sWkrug+ewYSU1bl+Srt6PWO5orThUvGLW9Me/utOn8
+-----END RSA PRIVATE KEY-----"
+            SERVER_IP: "54.163.148.40"
+            USER: "ubuntu"
           command: |
             # Decode SSH private key from Base64 to prevent formatting issues
             # cat "$AWS_PRIVATE_KEY"
