@@ -69,29 +69,29 @@ jobs:
             # Decode SSH private key from Base64 to prevent formatting issues
             # cat "$AWS_PRIVATE_KEY"
 
-            cat "$AWS_SERVER_IP"
-            # echo "$AWS_PRIVATE_KEY" > deploy_key.pem
-            # chmod 600 deploy_key.pem
-            # ssh-keyscan -H $AWS_SERVER_IP >> ~/.ssh/known_hosts
+            # cat "$AWS_SERVER_IP"
+            echo "$AWS_PRIVATE_KEY" > deploy_key.pem
+            chmod 600 deploy_key.pem
+            ssh-keyscan -H $AWS_SERVER_IP >> ~/.ssh/known_hosts
 
-            # ssh -i deploy_key.pem -o StrictHostKeyChecking=no ubuntu@$AWS_SERVER_IP \<< 'EOF'
-            #   echo "✅ Connected to AWS EC2"
+            ssh -o StrictHostKeyChecking=no -i deploy_key.pem $AWS_USER@$AWS_SERVER_IP \<< 'EOF'
+              echo "✅ Connected to AWS EC2"
 
-            #   # Ensure project directory exists
-            #   mkdir -p /home/ubuntu/workspace
-            #   cd /home/ubuntu/workspace || exit 1
+              # Ensure project directory exists
+              mkdir -p /home/ubuntu/workspace
+              cd /home/ubuntu/workspace || exit 1
 
-            #   # Clone or pull latest code
-            #   if [ ! -d ".git" ]; then
-            #     git clone git@github.com:AymaneQualiso/laravel-circle-ci.git .
-            #   else
-            #     git reset --hard
-            #     git pull origin main || true
-            #   fi
+              # Clone or pull latest code
+              if [ ! -d ".git" ]; then
+                git clone git@github.com:AymaneQualiso/laravel-circle-ci.git .
+              else
+                git reset --hard
+                git pull origin main || true
+              fi
 
-            #   # Restart application (Modify as needed)
-            #   sudo systemctl restart nginx php-fpm
-            # EOF
+              # Restart application (Modify as needed)
+              sudo systemctl restart nginx php-fpm
+            EOF
 
 workflows:
   version: 2
