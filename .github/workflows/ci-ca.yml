@@ -1,0 +1,89 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  test-php:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: laravel_test
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          tools: composer
+
+      - name: Install PHP dependencies
+        run: composer install --no-progress --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Setup environment file
+        run: cp .env.example .env
+
+      - name: Set database config
+        run: |
+          echo "DB_CONNECTION=mysql" >> .env
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_DATABASE=laravel_test" >> .env
+          echo "DB_USERNAME=user" >> .env
+          echo "DB_PASSWORD=password" >> .env
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Run migrations
+        run: php artisan migrate --force
+
+      - name: Run tests
+        run: ./vendor/bin/phpunit
+
+  deploy:
+    needs: test-php
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 54.163.148.40 >> ~/.ssh/known_hosts
+
+      - name: Deploy to Production
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@54.163.148.40 << 'EOF'
+            cd /home/ubuntu/workspace
+
+            if [ ! -d "laravel-circle-ci" ]; then
+              git clone git@github.com:AymaneQualiso/laravel-circle-ci.git
+            fi
+
+            cd laravel-circle-ci
+            git pull origin main
+
+            # Restart application or perform deployment steps
+          EOF
