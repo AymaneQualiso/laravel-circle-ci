@@ -58,7 +58,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - $SSH_FINGERPRINT
+            - "$SSH_FINGERPRINT"
             # - "SHA256:PHpuUx3tNLUkLE3O0BSULMrzvXJ0KHQ6uOSqKTtEdFM"  # Replace with your actual SSH key fingerprint from CircleCI
       - run:
           name: Setup SSH Key & Deploy
@@ -74,13 +74,47 @@ jobs:
                 git pull origin main || true
               fi
 
+              # composer install --no-interaction --prefer-dist --optimize-autoloader
+              # npm install
+              # npm run build
+              # php artisan cache:clear
+              # php artisan config:cache
+              # sudo systemctl restart php-fpm
+              # sudo systemctl restart ngnix
+
+              # Install PHP and Node.js if missing
+              echo "🔍 Checking for required software..."
+              if ! command -v php &> /dev/null; then
+                echo "⚡ Installing PHP..."
+                sudo apt update && sudo apt install -y php-cli php-mbstring unzip curl php-fpm
+              fi
+              if ! command -v composer &> /dev/null; then
+                echo "⚡ Installing Composer..."
+                curl -sS https://getcomposer.org/installer | php
+                sudo mv composer.phar /usr/local/bin/composer
+              fi
+              if ! command -v npm &> /dev/null; then
+                echo "⚡ Installing Node.js..."
+                sudo apt install -y nodejs npm
+              fi
+
+              # Install project dependencies
+              echo "📦 Installing dependencies..."
               composer install --no-interaction --prefer-dist --optimize-autoloader
               npm install
               npm run build
+
+              # Cache configuration
+              echo "⚙️ Clearing and caching Laravel config..."
               php artisan cache:clear
               php artisan config:cache
-              sudo systemctl restart php-fpm
-              sudo systemctl restart ngnix
+
+              # Restart necessary services
+              echo "🔄 Restarting services..."
+              sudo systemctl restart php8.1-fpm || sudo systemctl restart php-fpm
+              sudo systemctl restart nginx
+
+              echo "🚀 Deployment complete!"
             "
 
 #           env:
