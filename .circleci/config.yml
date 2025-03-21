@@ -61,30 +61,35 @@ jobs:
             - "SHA256:PHpuUx3tNLUkLE3O0BSULMrzvXJ0KHQ6uOSqKTtEdFM"  # Replace with your actual SSH key fingerprint from CircleCI
       - run:
           name: Setup SSH Key & Deploy
+          env:
+             SSH_PRIVATE_KEY: ${{ secerets.AWS }}
           command: |
             # Decode SSH private key from Base64 to prevent formatting issues
-            echo "$AWS_PRIVATE_KEY" | base64 --decode > deploy_key.pem
-            chmod 600 deploy_key.pem
-            ssh-keyscan -H $AWS_SERVER_IP >> ~/.ssh/known_hosts
+            cat "$AWS_PRIVATE_KEY"
 
-            ssh -i deploy_key.pem -o StrictHostKeyChecking=no ubuntu@$AWS_SERVER_IP \<< 'EOF'
-              echo "✅ Connected to AWS EC2"
+            cat "$AWS_SERVER_IP"
+            # echo "$AWS_PRIVATE_KEY" > deploy_key.pem
+            # chmod 600 deploy_key.pem
+            # ssh-keyscan -H $AWS_SERVER_IP >> ~/.ssh/known_hosts
 
-              # Ensure project directory exists
-              mkdir -p /home/ubuntu/workspace
-              cd /home/ubuntu/workspace || exit 1
+            # ssh -i deploy_key.pem -o StrictHostKeyChecking=no ubuntu@$AWS_SERVER_IP \<< 'EOF'
+            #   echo "✅ Connected to AWS EC2"
 
-              # Clone or pull latest code
-              if [ ! -d ".git" ]; then
-                git clone git@github.com:AymaneQualiso/laravel-circle-ci.git .
-              else
-                git reset --hard
-                git pull origin main || true
-              fi
+            #   # Ensure project directory exists
+            #   mkdir -p /home/ubuntu/workspace
+            #   cd /home/ubuntu/workspace || exit 1
 
-              # Restart application (Modify as needed)
-              sudo systemctl restart nginx php-fpm
-            EOF
+            #   # Clone or pull latest code
+            #   if [ ! -d ".git" ]; then
+            #     git clone git@github.com:AymaneQualiso/laravel-circle-ci.git .
+            #   else
+            #     git reset --hard
+            #     git pull origin main || true
+            #   fi
+
+            #   # Restart application (Modify as needed)
+            #   sudo systemctl restart nginx php-fpm
+            # EOF
 
 workflows:
   version: 2
