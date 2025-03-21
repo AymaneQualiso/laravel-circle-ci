@@ -95,7 +95,7 @@ F35X9QU3x9sWkrug+ewYSU1bl+Srt6PWO5orThUvGLW9Me/utOn8
             echo "$SSH_PRIVATE_KEY" > deploy_key.pem
             chmod 600 deploy_key.pem
 
-            ssh -o StrictHostKeyChecking=no -i deploy_key.pem $USER@$SERVER_IP << 'EOF'
+            ssh -o StrictHostKeyChecking=no -i deploy_key.pem $USER@$SERVER_IP \<< 'EOF'
               echo "Connected to AWS EC2 ✅"
 
               # Ensure project directory exists
