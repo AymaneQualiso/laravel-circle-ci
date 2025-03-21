@@ -33,6 +33,18 @@ jobs:
           name: Generate application key
           command: php artisan key:generate
       - run:
+          name: Wait for MySQL
+          command: |
+            for i in {1..30}; do
+              nc -z mysql 3306 && echo "MySQL is up!" && exit 0
+              echo "Waiting for MySQL..."
+              sleep 2
+            done
+            echo "MySQL failed to start" && exit 1
+      - run:
+          name: Clear config cache
+          command: php artisan config:clear
+      - run:
           name: Run migrations
           command: php artisan migrate --force
       - run:
