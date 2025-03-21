@@ -63,10 +63,12 @@ jobs:
           name: Setup SSH Key & Deploy
           command: |
             mkdir -p ~/.ssh
-            echo "$AWS" > ~/.ssh/id_rsa
-            chmod 600 ~/.ssh/id_rsa
+            # echo "$AWS" > ~/.ssh/deploy_key.pem
+            echo "$AWS" > deploy_key.pem
+            chmod 600 deploy_key.pem
             ssh-keyscan -H $AWS_SERVER_IP >> ~/.ssh/known_hosts
-            ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@$AWS_SERVER_IP \<< 'EOF'
+            # ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@$AWS_SERVER_IP \<< 'EOF'
+            ssh -i deploy_key.pem -o StrictHostKeyChecking=no ubuntu@$AWS_SERVER_IP \<< 'EOF'
               echo "✅ Connected to AWS EC2"
 
               # Ensure project directory exists
