@@ -60,9 +60,16 @@ jobs:
           fingerprints:
             - "SHA256:PHpuUx3tNLUkLE3O0BSULMrzvXJ0KHQ6uOSqKTtEdFM" # Replace with the actual key fingerprint from CircleCI
       - run:
+          name: Setup SSH Key
+          command: |
+            mkdir -p ~/.ssh
+            echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+      - run:
           name: SSH into Production & Deploy
           command: |
-            ssh -o StrictHostKeyChecking=no ubuntu@54.163.148.40 \<< 'EOF'
+            # ssh -o StrictHostKeyChecking=no ubuntu@54.163.148.40 \<< 'EOF'
+            ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@54.163.148.40 \<< 'EOF'
               # Navigate to the home directory
               cd /home/ubuntu/workspace
 
