@@ -67,9 +67,9 @@ jobs:
               cd /home/ubuntu/workspace
               if [ ! -d ".git" ]; then
                 git clone git@github.com:AymaneQualiso/laravel-circle-ci.git .
-                cd laravel-circle-ci
+                # cd laravel-circle-ci
               else
-                cd laravel-circle-ci
+                # cd laravel-circle-ci
                 git reset --hard
                 git pull origin main || true
               fi
