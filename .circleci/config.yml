@@ -54,7 +54,7 @@ jobs:
             echo "$AWS" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
             ssh-keyscan -H $AWS_SERVER_IP >> ~/.ssh/known_hosts
-            ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@$AWS_SERVER_IP << 'EOF'
+            ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ubuntu@$AWS_SERVER_IP \<< 'EOF'
               echo "✅ Connected to AWS EC2"
 
               # Ensure project directory exists
