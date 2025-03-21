@@ -92,32 +92,54 @@ F35X9QU3x9sWkrug+ewYSU1bl+Srt6PWO5orThUvGLW9Me/utOn8
             SERVER_IP: "54.163.148.40"
             USER: "ubuntu"
           command: |
-            # Decode SSH private key from Base64 to prevent formatting issues
-            # cat "$AWS_PRIVATE_KEY"
-
-            # cat "$AWS_SERVER_IP"
             echo "$SSH_PRIVATE_KEY" > deploy_key.pem
             chmod 600 deploy_key.pem
-            ssh-keyscan -H $SERVER_IP >> ~/.ssh/known_hosts
 
-            ssh -o StrictHostKeyChecking=no -i deploy_key.pem $USER@$SERVER_IP \<< 'EOF'
-              echo "✅ Connected to AWS EC2"
+            ssh -o StrictHostKeyChecking=no -i deploy_key.pem $USER@$SERVER_IP << 'EOF'
+              echo "Connected to AWS EC2 ✅"
 
               # Ensure project directory exists
               mkdir -p /home/ubuntu/workspace
+
+              # Go to project directory
               cd /home/ubuntu/workspace || exit 1
 
-              # Clone or pull latest code
+              # Check if the directory is a Git repository
               if [ ! -d ".git" ]; then
                 git clone git@github.com:AymaneQualiso/laravel-circle-ci.git .
               else
+                # Pull Latest Changes
                 git reset --hard
                 git pull origin main || true
-              fi
-
-              # Restart application (Modify as needed)
-              sudo systemctl restart nginx php-fpm
+              fi
             EOF
+          # command: |
+          #   # Decode SSH private key from Base64 to prevent formatting issues
+          #   # cat "$AWS_PRIVATE_KEY"
+
+          #   # cat "$AWS_SERVER_IP"
+          #   echo "$SSH_PRIVATE_KEY" > deploy_key.pem
+          #   chmod 600 deploy_key.pem
+          #   ssh-keyscan -H $SERVER_IP >> ~/.ssh/known_hosts
+
+          #   ssh -o StrictHostKeyChecking=no -i deploy_key.pem $USER@$SERVER_IP \<< 'EOF'
+          #     echo "✅ Connected to AWS EC2"
+
+          #     # Ensure project directory exists
+          #     mkdir -p /home/ubuntu/workspace
+          #     cd /home/ubuntu/workspace || exit 1
+
+          #     # Clone or pull latest code
+          #     if [ ! -d ".git" ]; then
+          #       git clone git@github.com:AymaneQualiso/laravel-circle-ci.git .
+          #     else
+          #       git reset --hard
+          #       git pull origin main || true
+          #     fi
+
+          #     # Restart application (Modify as needed)
+          #     sudo systemctl restart nginx php-fpm
+          #   EOF
 
 workflows:
   version: 2
