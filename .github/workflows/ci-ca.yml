@@ -59,7 +59,7 @@ jobs:
         run: ./vendor/bin/phpunit
 
   deploy:
-    needs: test-php
+    needs: run-deploy
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
