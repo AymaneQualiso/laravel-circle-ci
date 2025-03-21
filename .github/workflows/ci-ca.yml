@@ -66,24 +66,36 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup SSH Key
+      # - name: Setup SSH Key
+        # run: |
+        #   mkdir -p ~/.ssh
+        #   echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        #   chmod 600 ~/.ssh/id_rsa
+        #   ssh-keyscan -H 54.163.148.40 >> ~/.ssh/known_hosts
+
+      - name: Connect to AWS EC2 & Deploy
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.AWS }}
+          SERVER_IP: ${{ secrets.AWS_SERVER_IP }}
+          USER: ${{ secrets.AWS_USER }}
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H 54.163.148.40 >> ~/.ssh/known_hosts
+          echo "$SSH_PRIVATE_KEY" > deploy_key.pem
+          chmod 600 deploy_key.pem
 
-      - name: Deploy to Production
-        run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@54.163.148.40 << 'EOF'
-            cd /home/ubuntu/workspace
+          ssh -o StrictHostKeyChecking=no -i deploy_key.pem $USER@$SERVER_IP << 'EOF'
+            echo "Connected to AWS EC2 ✅"
 
-            if [ ! -d "laravel-circle-ci" ]; then
-              git clone git@github.com:AymaneQualiso/laravel-circle-ci.git
-            fi
+            # Ensure project directory exists
+            mkdir -p /home/ubuntu/my-app
 
-            cd laravel-circle-ci
-            git pull origin main
+            # Go to project directory
+            cd /home/ubuntu/my-app || exit 1
 
-            # Restart application or perform deployment steps
-          EOF
+            # Check if the directory is a Git repository
+            if [ ! -d ".git" ]; then
+              git clone git@github.com:AymaneQualiso/laravel-circle-ci.git .
+            else
+              # Pull Latest Changes
+              git reset --hard
+              git pull origin main || true
+            fi
