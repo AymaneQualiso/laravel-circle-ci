@@ -1,0 +1,112 @@
+# This config was automatically generated from your source code
+# Stacks detected: deps:node:.,deps:php:.
+version: 2.1
+orbs:
+  php: circleci/php@1
+jobs:
+  test-php:
+    # Install php packages and run tests
+    docker:
+      - image: cimg/php:8.1-node
+      - image: mysql:8.0
+        name: mysql
+        environment:
+          MYSQL_DATABASE: laravel_test
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: root
+    steps:
+      - checkout
+      - php/install-packages
+      - run:
+          name: Setup environment file
+          command: cp .env.example .env
+      - run:
+          name: Set database config
+          command: |
+            echo "DB_CONNECTION=mysql" >> .env
+            echo "DB_HOST=mysql" >> .env  # 🔹 Use service name, not 127.0.0.1
+            echo "DB_PORT=3306" >> .env
+            echo "DB_DATABASE=laravel_test" >> .env
+            echo "DB_USERNAME=user" >> .env
+            echo "DB_PASSWORD=password" >> .env
+      - run:
+          name: Generate application key
+          command: php artisan key:generate
+      - run:
+          name: Wait for MySQL
+          command: |
+            for i in {1..30}; do
+              nc -z mysql 3306 && echo "MySQL is up!" && exit 0
+              echo "Waiting for MySQL..."
+              sleep 2
+            done
+            echo "MySQL failed to start" && exit 1
+      - run:
+          name: Clear config cache
+          command: php artisan config:clear
+      - run:
+          name: Run migrations
+          command: php artisan migrate --env=testing --force
+      - run:
+          name: run tests
+          command: ./vendor/bin/phpunit
+  deploy:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:PHpuUx3tNLUkLE3O0BSULMrzvXJ0KHQ6uOSqKTtEdFM"  # Replace with the actual key fingerprint from CircleCI
+      - run:
+          name: SSH into Production & Deploy
+          command: |
+            ssh -o StrictHostKeyChecking=no ubuntu@54.163.148.40 \<< 'EOF'
+              # Navigate to the home directory
+              cd /home/ubuntu/workspace
+
+              # If the project directory doesn't exist, clone it
+              if [ ! -d "laravel-circle-ci" ]; then
+                git clone git@github.com:AymaneQualiso/laravel-circle-ci.git
+              fi
+
+              # Enter the project directory
+              cd laravel-circle-ci
+
+              # Ensure we have the latest code
+              git pull origin main
+
+              # Build and run the Docker container
+              # sudo docker build -t front-app .
+              # sudo docker stop front-app || true
+              # sudo docker rm front-app || true
+              # sudo docker run -dp 4444:80 --name front-app front-app
+            EOF
+# workflows:
+#   build-and-test:
+#     jobs:
+#       - test-php
+#     # - deploy:
+#     #     requires:
+#     #       - test-php
+workflows:
+  production_pipeline:
+    when:
+      equal: [ "main", << pipeline.git.branch >> ]
+    jobs:
+      - test-php
+      # - deploy-prod
+      - deploy:
+          requires:
+            - test-php # only deploy once build job has completed
+          filters:
+            branches:
+              only: main
+
+  development_pipeline:
+    when:
+      equal: [ "main", << pipeline.git.branch >> ]
+    jobs:
+      - test-php
+      # - deploy-dev
