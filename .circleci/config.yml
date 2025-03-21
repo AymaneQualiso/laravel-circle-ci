@@ -58,7 +58,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "SHA256:PHpuUx3tNLUkLE3O0BSULMrzvXJ0KHQ6uOSqKTtEdFM"  # Replace with the actual key fingerprint from CircleCI
+            - "SHA256:PHpuUx3tNLUkLE3O0BSULMrzvXJ0KHQ6uOSqKTtEdFM" # Replace with the actual key fingerprint from CircleCI
       - run:
           name: SSH into Production & Deploy
           command: |
