@@ -67,7 +67,7 @@ jobs:
             chmod 600 deploy_key.pem
             ssh-keyscan -H $AWS_SERVER_IP >> ~/.ssh/known_hosts
 
-            ssh -i deploy_key.pem -o StrictHostKeyChecking=no ubuntu@$AWS_SERVER_IP << 'EOF'
+            ssh -i deploy_key.pem -o StrictHostKeyChecking=no ubuntu@$AWS_SERVER_IP \<< 'EOF'
               echo "✅ Connected to AWS EC2"
 
               # Ensure project directory exists
