@@ -61,11 +61,13 @@ jobs:
             - "SHA256:PHpuUx3tNLUkLE3O0BSULMrzvXJ0KHQ6uOSqKTtEdFM"  # Replace with your actual SSH key fingerprint from CircleCI
       - run:
           name: Setup SSH Key & Deploy
-          env:
-             SSH_PRIVATE_KEY: ${{ secerets.AWS }}
+            # env:
+            #   SSH_PRIVATE_KEY: ${{ secrets.AWS }}
+            #   SERVER_IP: ${{ secrets.AWS_SERVER_IP }}
+            #   USER: ${{ secrets.AWS_USER }}
           command: |
             # Decode SSH private key from Base64 to prevent formatting issues
-            cat "$AWS_PRIVATE_KEY"
+            # cat "$AWS_PRIVATE_KEY"
 
             cat "$AWS_SERVER_IP"
             # echo "$AWS_PRIVATE_KEY" > deploy_key.pem
